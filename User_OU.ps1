@@ -133,10 +133,28 @@ function New-RandomPassword
         $x = Get-Random -Minimum 0 -Maximum $letter.Count
         $randomLetter += $letter[$x]
     }
+    $charIndex = Get-Random -Minimum 0 -Maximum $specialChar.Count
+    $randomChar = $specialChar[$charIndex]
+    $password = $randomLetter + $randomChar + $randonInt.ToString()
+    $shuffledPwd = -join($password -split''|sort{Get-Random})
+    return $shuffledPwd
+}
+function New-RandomDirectorPassword
+{
+    $randonInt = Get-Random -Minimum 10000 -Maximum 99999
+    $letter = ([char[]]([char]65..[char]90) + ([char[]]([char]97..[char]122)))
+    $specialChar = ([char[]]([char]33..[char]46) + ([char[]]([char]58..[char]64)) + ([char[]]([char]123..[char]126)))
+    $randomLetter = ""
+    $randomChar = ""
+    for($i = 0; $i -lt 8; $i++)
+    {
+        $x = Get-Random -Minimum 0 -Maximum $letter.Count
+        $randomLetter += $letter[$x]
+    }
     for($i = 0; $i -lt 2; $i++)
     {
-        $y = Get-Random -Minimum 0 -Maximum $specialChar.Count
-        $randomChar += $specialChar[$y]
+        $charIndex = Get-Random -Minimum 0 -Maximum $specialChar.Count
+        $randomChar += $specialChar[$charIndex]
     }
     $password = $randomLetter + $randomChar + $randonInt.ToString()
     $shuffledPwd = -join($password -split''|sort{Get-Random})
@@ -215,7 +233,7 @@ foreach($e in $employees)
     
     $regOName = $oName -replace " ",""
     Write-Host "Creating $($regOName) in Department $($path)"
-    $passwd = New-RandomPassword
+    $passwd = New-RandomDirectorPassword
        New-ADUser -Name $($regPrenom + " " + $regNom) -GivenName $regPrenom -Surname $regNom -Description $e.Description -Initials ($regPrenom[0]+$regNom[0]) -Department $e.Département -SamAccountName $regOName -UserPrincipalName $UPN -Office $e.Bureau -OfficePhone $e.'N° interne'-Path $path -AccountPassword $(ConvertTo-SecureString -AsPlainText $passwd -Force) -ChangePasswordAtLogon $true -Enabled $true
        $UPN+";"+$passwd>> "c:\\Users$($date.ToString()).csv"
        Write-Host "Creating user $($regOName) with password $($passwd)"
