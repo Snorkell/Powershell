@@ -1,16 +1,5 @@
-Write-Host "Welcome to the firewall assistant script"
-Read-Host "Appuyez sur une touche pour continuer"
-Write-Host "Please select which option you want to use"
-Write-Host "1. Open port"
-Write-Host "2. Close port"
-$choiceOne = Read-Host "Choice "
-switch($choiceOne)
-{
-    1 {open}
-    2 {close}
-    default {}
-}
-function open
+﻿$date = Get-Date -UFormat "%Y-%m-%d_%H-%M-%S"
+function open()
 {
     Write-Host "Which type of rule do you want to open ?"
     Write-Host "1.Inbound"
@@ -23,7 +12,7 @@ function open
         default{}
     }
 }
-function close
+function close()
 {
     Write-Host "Which type of rule do you want to close ?"
     Write-Host "1.Inbound"
@@ -80,10 +69,31 @@ function openInbound
     {
         1
         {
+            if(!(Test-Path  "C:\\Scripts"))
+            {
+                New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+            }
+            $path = "C:\\Logs\FireWall"
+            if(!(Test-Path  $path))
+            {
+                New-Item -ItemType Directory -Force -Path $path
+            }
+            $path2 = "C:\\Scripts\Firewall"
+            if(!(Test-Path  $path2))
+            {
+                New-Item -ItemType Directory -Force -Path $path2
+            }
+            $scriptPath = $path2+"\firewall"+$date+".ps1"
+            $logPath = $path + "\logs"+$date+".txt"
+            "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+            
+            $scriptContent = ""
             foreach($a in $ListofPortToClose)
             {
                 Enable-NetFirewallRule -Name $a
+                $scriptContent += "Enable-NetFirewallRule -Name $($a) `n"
             }
+            $scriptContent >> $scriptPath
         }
         2
         {
@@ -128,6 +138,24 @@ function openInbound
             }
             foreach($a in $specificPortListToClose)
             {
+                if(!(Test-Path  "C:\\Scripts"))
+                {
+                    New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+                }
+                $path = "C:\\Logs\FireWall"
+                if(!(Test-Path  $path))
+                {
+                    New-Item -ItemType Directory -Force -Path $path
+                }
+                $path2 = "C:\\Scripts\Firewall"
+                if(!(Test-Path  $path2))
+                {
+                    New-Item -ItemType Directory -Force -Path $path2
+                }
+                $scriptPath = $path2+"\firewall"+$date+".ps1"
+                $logPath = $path + "\logs"+$date+".txt"
+                "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+                "Enable-NetFirewallRule -Name $($a)" >> $scriptPath
                 Enable-NetFirewallRule -Name $a
                 Write-Host "Ports successfully Opened"
             }
@@ -180,10 +208,31 @@ function openOutbound
     {
         1
         {
+            if(!(Test-Path  "C:\\Scripts"))
+            {
+                New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+            }
+            $path = "C:\\Logs\FireWall"
+            if(!(Test-Path  $path))
+            {
+                New-Item -ItemType Directory -Force -Path $path
+            }
+            $path2 = "C:\\Scripts\Firewall"
+            if(!(Test-Path  $path2))
+            {
+                New-Item -ItemType Directory -Force -Path $path2
+            }
+            $scriptPath = $path2+"\firewall"+$date+".ps1"
+            $logPath = $path + "\logs"+$date+".txt"
+            "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+            
+            $scriptContent = ""
             foreach($a in $ListofPortToClose)
             {
                 Enable-NetFirewallRule -Name $a
+                $scriptContent += "Enable-NetFirewallRule -Name $($a) `n"
             }
+            $scriptContent >> $scriptPath
         }
         2
         {
@@ -228,6 +277,24 @@ function openOutbound
             }
             foreach($a in $specificPortListToClose)
             {
+                if(!(Test-Path  "C:\\Scripts"))
+                {
+                    New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+                }
+                $path = "C:\\Logs\FireWall"
+                if(!(Test-Path  $path))
+                {
+                    New-Item -ItemType Directory -Force -Path $path
+                }
+                $path2 = "C:\\Scripts\Firewall"
+                if(!(Test-Path  $path2))
+                {
+                    New-Item -ItemType Directory -Force -Path $path2
+                }
+                $scriptPath = $path2+"\firewall"+$date+".ps1"
+                $logPath = $path + "\logs"+$date+".txt"
+                "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+                "Enable-NetFirewallRule -Name $($a)" >> $scriptPath
                 Enable-NetFirewallRule -Name $a
                 Write-Host "Ports successfully Opened"
             }
@@ -279,10 +346,31 @@ function closeInbound
     {
         1
         {
+            if(!(Test-Path  "C:\\Scripts"))
+            {
+                New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+            }
+            $path = "C:\\Logs\FireWall"
+            if(!(Test-Path  $path))
+            {
+                New-Item -ItemType Directory -Force -Path $path
+            }
+            $path2 = "C:\\Scripts\Firewall"
+            if(!(Test-Path  $path2))
+            {
+                New-Item -ItemType Directory -Force -Path $path2
+            }
+            $scriptPath = $path2+"\firewall"+$date+".ps1"
+            $logPath = $path + "\logs"+$date+".txt"
+            "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+            
+            $scriptContent = ""
             foreach($a in $ListofPortToClose)
             {
-                Enable-NetFirewallRule -Name $a
+                Disable-NetFirewallRule -Name $a
+                $scriptContent += "Disable-NetFirewallRule -Name $($a) `n"
             }
+            $scriptContent >> $scriptPath
         }
         2
         {
@@ -327,7 +415,25 @@ function closeInbound
             }
             foreach($a in $specificPortListToClose)
             {
-                Enable-NetFirewallRule -Name $a
+                if(!(Test-Path  "C:\\Scripts"))
+                {
+                    New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+                }
+                $path = "C:\\Logs\FireWall"
+                if(!(Test-Path  $path))
+                {
+                    New-Item -ItemType Directory -Force -Path $path
+                }
+                $path2 = "C:\\Scripts\Firewall"
+                if(!(Test-Path  $path2))
+                {
+                    New-Item -ItemType Directory -Force -Path $path2
+                }
+                $scriptPath = $path2+"\firewall"+$date+".ps1"
+                $logPath = $path + "\logs"+$date+".txt"
+                "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+                "Disable-NetFirewallRule -Name $($a)" >> $scriptPath
+                Disable-NetFirewallRule -Name $a
                 Write-Host "Ports successfully closed"
             }
         }
@@ -376,10 +482,31 @@ function closeOutbound
     {
         1
         {
+            if(!(Test-Path  "C:\\Scripts"))
+            {
+                New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+            }
+            $path = "C:\\Logs\FireWall"
+            if(!(Test-Path  $path))
+            {
+                New-Item -ItemType Directory -Force -Path $path
+            }
+            $path2 = "C:\\Scripts\Firewall"
+            if(!(Test-Path  $path2))
+            {
+                New-Item -ItemType Directory -Force -Path $path2
+            }
+            $scriptPath = $path2+"\firewall"+$date+".ps1"
+            $logPath = $path + "\logs"+$date+".txt"
+            "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+            
+            $scriptContent = ""
             foreach($a in $ListofPortToClose)
             {
-                Enable-NetFirewallRule -Name $a
+                Disable-NetFirewallRule -Name $a
+                $scriptContent += "Disable-NetFirewallRule -Name $($a) `n"
             }
+            $scriptContent >> $scriptPath
         }
         2
         {
@@ -423,10 +550,39 @@ function closeOutbound
                 $specificPortListToClose.Add($specificPortList[$x-1])
             }
             foreach($a in $specificPortListToClose)
-            {
-                Enable-NetFirewallRule -Name $a
+            {if(!(Test-Path  "C:\\Scripts"))
+                {
+                    New-Item -ItemType Directory -Force -Path "C:\\Scripts"
+                }
+                $path = "C:\\Logs\FireWall"
+                if(!(Test-Path  $path))
+                {
+                    New-Item -ItemType Directory -Force -Path $path
+                }
+                $path2 = "C:\\Scripts\Firewall"
+                if(!(Test-Path  $path2))
+                {
+                    New-Item -ItemType Directory -Force -Path $path2
+                }
+                $scriptPath = $path2+"\firewall"+$date+".ps1"
+                $logPath = $path + "\logs"+$date+".txt"
+                "$($env:UserName) modify the firewall at $($date) check at $($scriptPath) to see the modifications" >> $logPath
+                "Disable-NetFirewallRule -Name $($a)" >> $scriptPath
+                Disable-NetFirewallRule -Name $a
                 Write-Host "Ports successfully closed"
             }
         }
     }    
+}
+Write-Host "Welcome to the firewall assistant script"
+Read-Host "Appuyez sur une touche pour continuer"
+Write-Host "Please select which option you want to use"
+Write-Host "1. Open port"
+Write-Host "2. Close port"
+$choiceOne = Read-Host "Choice "
+switch($choiceOne)
+{
+    1 {open}
+    2 {close}
+    default {}
 }
