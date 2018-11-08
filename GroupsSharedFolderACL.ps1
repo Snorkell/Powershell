@@ -138,8 +138,7 @@ $accessControlEntryRWDirection = New-Object System.Security.AccessControl.FileSy
 
 $aclInheritance = Get-Acl -Path "C:\Shared"
 $aclInheritance.SetAccessRuleProtection($True,$True)
-Set-Acl -Path "C:\Shared" -AclObject $aclInheritance
-
+Set-Acl "C:\Shared" $aclInheritance
 $objACL = Get-Acl "C:\Shared"
 $objACL.Access | %{ $objACL.RemoveAccessRule($_) }
 $objACL.SetAccessRule($accessControlEntryRAll)
@@ -171,11 +170,20 @@ foreach($parentOU in $parentsOU)
 
     $groupRW = Get-ADGroup -Filter * | Where {$_.Name -like "GL-$($parentOU.Name)-RW"}
     $accessControlEntryRW = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRW.Name, $readWrite, $inheritanceFlag, $propagationFlag, $type)
+    $groupDirRW = Get-ADGroup -Filter * | Where {$_.Name -like "GL-Direction-RW"}
+    $accessControlEntryDirRW = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupDirRW.Name, $readWrite, $inheritanceFlag, $propagationFlag, $type)
 
     $childsOU = Get-ADOrganizationalUnit -Filter * -SearchBase $parentOU.DistinguishedName 
 
     # Removing parent OU from childs
     $childsOU = @($childsOU | Where-Object { $_ -ne $childsOU[0] })
+	
+	$objACL = Get-Acl "C:\Shared\$($parentOU.Name)"
+	$objACL.Access | %{ $objACL.RemoveAccessRule($_) }
+	$objACL.SetAccessRule($accessControlEntryRWAdm)
+	$objACL.SetAccessRule($accessControlEntryRW)
+	$objACL.SetAccessRule($accessControlEntryDirRW)
+
     
     if($childsOU.Count -gt 1) {
         foreach($childOU in $childsOU) {
@@ -214,8 +222,16 @@ foreach($parentOU in $parentsOU)
             $objACL = Get-Acl "C:\Shared\$($parentOU.Name)\$($childOU.Name)"
             $objACL.RemoveAccessRule($accessControlEntryRChild)
             $objACL.SetAccessRule($accessControlEntryRWChild)
+	        $objACL.SetAccessRule($accessControlEntryDirRW)
+
             Set-Acl "C:\Shared\$($parentOU.Name)\$($childOU.Name)" $objACL
         } 
         $childs = @()
     }  
 }
+
+$groupRAll = Get-ADGroup -Filter * | Where {$_.Name -like "GL-AllUsers-R"}
+$accessControlEntryRAll = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRAll.Name, $readOnly, $inheritanceFlag, $propagationFlag, $type)
+$objACL = Get-Acl "C:\Shared\Direction"
+$objACL.RemoveAccessRule($accessControlEntryRAll)
+Set-Acl "C:\Shared\Direction" $objACL
