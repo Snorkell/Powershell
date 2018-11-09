@@ -124,6 +124,7 @@ $fullControl = [System.Security.AccessControl.FileSystemRights]"FullControl"
 
 $inheritanceFlag = [System.Security.AccessControl.InheritanceFlags]"ContainerInherit, ObjectInherit"
 $propagationFlag = [System.Security.AccessControl.PropagationFlags]::None
+$propagationFlag2 = [System.Security.AccessControl.PropagationFlags]::"ContainerInherit, InheritOnly, NoPropagateInherit"
 
 $type = [System.Security.AccessControl.AccessControlType]::Allow
 
@@ -206,28 +207,31 @@ foreach($parentOU in $parentsOU)
             $aclInheritance.SetAccessRuleProtection($True,$True)
             Set-Acl -Path "C:\Shared\$($parentOU.Name)\$($childOU.Name)" -AclObject $aclInheritance
 
-            foreach($child in $childs) {
+           <# foreach($child in $childs) {
 
                 $groupRChild = Get-ADGroup -Filter * | Where {$_.Name -like "GL-$($child)-R"}
                 $accessControlEntryRChild = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRChild.Name, $readOnly, $inheritanceFlag, $propagationFlag, $type)
                 $objACL = Get-Acl "C:\Shared\$($parentOU.Name)\$($childOU.Name)"
                 $objACL.SetAccessRule($accessControlEntryRChild)
                 Set-Acl "C:\Shared\$($parentOU.Name)\$($childOU.Name)" $objACL
-            }
+            }#>
 
             $groupRChild = Get-ADGroup -Filter * | Where {$_.Name -like "GL-$($childOU.Name)-R"}
             $groupRWChild = Get-ADGroup -Filter * | Where {$_.Name -like "GL-$($childOU.Name)-RW"}
-            $accessControlEntryRChild = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRChild.Name, $readOnly, $inheritanceFlag, $propagationFlag, $type)
-            $accessControlEntryRWChild = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRWChild.Name, $readWrite, $inheritanceFlag, $propagationFlag, $type)
+            $accessControlEntryRChild = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRChild.Name, $readWrite, $inheritanceFlag, $propagationFlag, $type)
             $objACL = Get-Acl "C:\Shared\$($parentOU.Name)\$($childOU.Name)"
-            $objACL.RemoveAccessRule($accessControlEntryRChild)
-            $objACL.SetAccessRule($accessControlEntryRWChild)
+            $objACL.SetAccessRule($accessControlEntryRChild)
 	        $objACL.SetAccessRule($accessControlEntryDirRW)
 
             Set-Acl "C:\Shared\$($parentOU.Name)\$($childOU.Name)" $objACL
         } 
         $childs = @()
     }  
+    $groupRWAllParent = Get-ADGroup -Filter * | Where {$_.Name -like "GL-$($parentOU.Name)-RW"}
+    $accessControlEntryRWAllParent = New-Object System.Security.AccessControl.FileSystemAccessRule @($groupRWAllParent.Name, $readWrite, $inheritanceFlag, $propagationFlag, $type)
+    $objACL = Get-Acl "C:\Shared\Commun"
+    $objACL.SetAccessRule($accessControlEntryRWAllParent)
+    Set-Acl "C:\Shared\Commun" $objACL
 }
 
 $groupRAll = Get-ADGroup -Filter * | Where {$_.Name -like "GL-AllUsers-R"}
@@ -235,3 +239,4 @@ $accessControlEntryRAll = New-Object System.Security.AccessControl.FileSystemAcc
 $objACL = Get-Acl "C:\Shared\Direction"
 $objACL.RemoveAccessRule($accessControlEntryRAll)
 Set-Acl "C:\Shared\Direction" $objACL
+NET SHARE Shared=C:\Shared /GRANT:everyone,FULL
